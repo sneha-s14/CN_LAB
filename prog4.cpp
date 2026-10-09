@@ -1,61 +1,67 @@
 #include<iostream>
 #include<vector>
-#include<string>
-#include<algorithm>
 #include<bits/stdc++.h>
-#include<ctime>
 
 using namespace std;
 
-struct Frame{
-	int SeqNo;
-	string data;
+struct Edge{
+    int src, dest, weight;
 };
 
-int main(){
-	string message;
-	int chunksize;
-	vector<Frame> frames;
-	cout<<"Enter the message to be transmitted:";
-	getline(cin, message);
-	cout<<"Enter the frame chunk size:";
-	cin>>chunksize;
-	int msgLen=message.length();
-	int seq=0;
-	for(int i=0;i<msgLen;i+=chunksize){
-	    Frame f;
-	    f.SeqNo=seq++;
-	    f.data=message.substr(i,chunksize);
-	    frames.push_back(f);
+void bellmanFord(int V, int E, const vector<Edge>& edges, int src){
+	vector<int> dist(V, INT_MAX);
+	dist[src]=0;
+	for(int i=1;i<=V-1;++i){
+	 	for(int j=0;j<E;++j){
+	 		int u=edges[j].src;
+	 		int v=edges[j].dest;
+	 		int weight=edges[j].weight;
+	 		if(dist[u]!=INT_MAX&&dist[u]+weight<dist[v]){
+	 			dist[v]=dist[u]+weight;
+	 		}
+	 	}
+	 }
+	 
+	 bool hasNegativeCycle=false;
+	 for(int j=0;j<E;++j){
+	 	int u=edges[j].src;
+	 	int v=edges[j].dest;
+	 	int weight=edges[j].weight;
+	 	if(dist[u]!=INT_MAX&&dist[u]+weight<dist[v]){
+	 		hasNegativeCycle=true;
+	 		break;
+	 	}
 	}
 	
-	srand(static_cast<unsigned int>(time(0)));
-	for(size_t i=frames.size()-1;i>0;--i){
-		size_t j=rand()%(i+1);
-		swap(frames[i], frames[j]);
+	if(hasNegativeCycle){
+		cout<<"\nGraph contains a negative weight cycle:";
+		cout<<"Shortest paths cannot be uniquely determined"<<endl;
 	}
-	cout<<"\n---Frames Received Out of Order at Receiver---"<<endl;
-	cout<<"Seq No\tData"<<endl;
-	for(const auto& f:frames){
-		cout<<f.SeqNo<<"\t"<<f.data<<endl;
-	}
-	int n=frames.size();
-	for(int i=0;i<n-1;++i){
-		for(int j=0;j<n-i-1;++j){
-			if(frames[j].SeqNo>frames[j+1].SeqNo){
-				swap(frames[j],frames[j+1]);
+	else{
+		cout<<"\nVertex Distance from source("<<src<<"):"<<endl;
+		for(int i=0;i<V;++i){
+			if(dist[i]==INT_MAX){
+				cout<<i<<"\t"<<dist[i]<<endl;
 			}
 		}
 	}
-	cout<<"\n---Frames After Applying Sorting Technique---"<<endl;
-	cout<<"Seq No\t Data"<<endl;
-	for(const auto& f:frames){
-		cout<<f.SeqNo<<"\t"<<f.data<<endl;
+}
+	
+int main(){
+	int V,E;
+	cout<<"Enter the number of vertices:";
+	cin>>V;
+	cout<<"Enter the number of edges:";
+	cin>>E;
+	vector<Edge> edges(E);
+	cout<<"Enter edges details(source, destination, weight):"<<endl;
+	for(int i=0;i<E;++i){
+		cin>>edges[i].src>>edges[i].dest>>edges[i].weight;
 	}
-	cout<<"\nReconstructed Message:";
-	for(const auto& f:frames){
-		cout<<f.data;
-	}
-	cout<<endl;
+	int source;
+	cout<<"Enter the source vertex:";
+	cin>>source;
+	bellmanFord(V,E,edges,source);
+	
 	return 0;
 }
