@@ -37,13 +37,17 @@ void bellmanFord(int V, int E, const vector<Edge>& edges, int src){
 		cout<<"\nGraph contains a negative weight cycle:";
 		cout<<"Shortest paths cannot be uniquely determined"<<endl;
 	}
-	else{
-		cout<<"\nVertex Distance from source("<<src<<"):"<<endl;
-		for(int i=0;i<V;++i){
-			if(dist[i]==INT_MAX){
-				cout<<i<<"\t"<<dist[i]<<endl;
-			}
-		}
+	
+    else{
+        cout<<"\nVertex Distance from source("<<src<<"):"<<endl;
+    	for(int i=0;i<V;++i){
+       		if(dist[i]==INT_MAX){
+           		cout<<i<<"\t"<<"INF"<<endl;
+       	    }
+        	else{
+            	cout<<i<<"\t"<<dist[i]<<endl;
+        	}
+    	}
 	}
 }
 	
